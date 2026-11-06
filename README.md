@@ -40,14 +40,8 @@ c:\project security\
 │   │   └── mailer.py
 │   └── app.py                       # שרת Flask מאובטח (Parameters + Anti-XSS)
 │
-├── tests\                           # מערך בדיקות אוטומטיות מלא (15 בדיקות)
-│   ├── test_vulnerable_app.py       # מוכיח הצלחת מתקפות בגרסה הפגיעה
-│   ├── test_secure_app.py           # מוכיח חסימה הרמטית בגרסה המאובטחת
-│   └── run_all_tests.py             # מריץ את כל 15 הבדיקות ומפיק דו"ח ביקורת
-│
 ├── run_vulnerable.bat               # הפעלה בלחיצה של הגרסה הפגיעה
 ├── run_secure.bat                   # הפעלה בלחיצה של הגרסה המאובטחת
-├── run_tests.bat                    # הרצת כל הבדיקות האוטומטיות
 ├── README.md                        # מדריך זה
 └── CYBER_SECURITY_REPORT.md         # דו"ח הגשה אקדמי מפורט עם צילומי פיילודים
 ```
@@ -56,16 +50,12 @@ c:\project security\
 
 ## 🚀 הוראות הרצה מהירה
 
-### 1. הרצת כל בדיקות האבטחה האוטומטיות (Audit Suite)
+### 1. הפעלת המערכת הראשית (חלק א' - גרסה מאובטחת)
 להרצה ישירה דרך PowerShell / Command Prompt:
 ```cmd
-run_tests.bat
+python app.py
 ```
-או ישירות באמצעות פייתון:
-```cmd
-python tests\run_all_tests.py
-```
-*כל 15 הבדיקות ירוצו ברצף ויציגו תוצאת `SUCCESS - All Cyber Security Requirements Verified 100%!`.*
+* השרת יעלה ישירות בכתובת: **`http://127.0.0.1:5000`**
 
 ### 2. הפעלת הגרסה הפגיעה (Vulnerable App)
 ```cmd
