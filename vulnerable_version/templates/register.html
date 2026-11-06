@@ -57,15 +57,22 @@
                 </div>
 
                 <div class="exploit-card mt-4">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-bug-fill text-danger fs-4 me-2"></i>
-                        <strong>מעבדת תקיפה - הדגמת SQL Injection בהרשמה:</strong>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-bug-fill text-danger fs-4 me-2"></i>
+                            <strong>מעבדת תקיפה - הדגמת SQL Injection בהרשמה:</strong>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0" onclick="copyToClipboard('test\' OR \'1\'=\'1', this)">
+                            <i class="bi bi-clipboard"></i> העתק פיילוד
+                        </button>
                     </div>
-                    <p class="small text-muted mt-2 mb-0">
+                    <p class="small text-muted mt-2 mb-1">
                         בדיקת קיום המשתמש בשלב הרישום מתבצעת ללא פרמטרים מוגנים:
-                        <code>SELECT * FROM users WHERE username = '{username}' OR email = '{email}'</code><br>
-                        הזרקת תווים מיוחדים כגון <code>test' OR '1'='1</code> משבשת את השאילתה.
+                        <code>SELECT * FROM users WHERE username = '{username}' OR email = '{email}'</code>
                     </p>
+                    <div class="p-2 bg-white border rounded">
+                        <code class="user-select-all text-dark d-block">test' OR '1'='1</code>
+                    </div>
                 </div>
             </div>
         </div>

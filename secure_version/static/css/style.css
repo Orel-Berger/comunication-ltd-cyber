@@ -110,3 +110,8 @@ body {
     padding: 15px;
     margin-top: 20px;
 }
+
+code, pre, .user-select-all {
+    user-select: all !important;
+    cursor: pointer;
+}

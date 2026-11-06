@@ -48,10 +48,13 @@
                 <div class="alert alert-secondary py-2 px-3 small mt-3 mb-0">
                     <div class="d-flex justify-content-between align-items-center">
                         <span><i class="bi bi-info-circle-fill text-primary"></i> <strong>משתמש ברירת מחדל לבדיקה:</strong></span>
-                        <button type="button" class="btn btn-sm btn-outline-primary py-0" onclick="fillAdmin()">מלא אוטומטית</button>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 me-1" onclick="copyToClipboard('Cyber@2026Admin!', this)">העתק סיסמה</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0" onclick="fillAdmin()">מלא אוטומטית</button>
+                        </div>
                     </div>
                     <div class="mt-1 text-muted">
-                        יוזר: <code>admin_cyber</code> | סיסמה: <code>Cyber@2026Admin!</code>
+                        יוזר: <code class="user-select-all">admin_cyber</code> | סיסמה: <code class="user-select-all">Cyber@2026Admin!</code>
                     </div>
                 </div>
 
@@ -64,11 +67,21 @@
                         בגרסה פגיעה זו, שאילתת ה-SQL משרשרת את הקלט ישירות:
                         <code>SELECT * FROM users WHERE username = '{username}'</code>
                     </p>
-                    <p class="small mb-0">
-                        <strong>פיילוד עקיפת התחברות (Bypass):</strong><br>
-                        הזן בשם המשתמש: <code class="bg-light p-1 border rounded">admin_cyber' --</code><br>
-                        והשאר את הסיסמה ריקה או הקש תו כלשהו כדי להתחבר ישירות כמנהל!
-                    </p>
+                    <div class="p-2 bg-white border rounded mt-2">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="small text-danger">פיילוד עקיפת התחברות (SQLi Bypass):</strong>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 me-1" onclick="copyToClipboard('admin_cyber\' --', this)">
+                                    <i class="bi bi-clipboard"></i> העתק פיילוד
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="injectSqliLogin()">
+                                    <i class="bi bi-box-arrow-in-right"></i> הזרק לטופס
+                                </button>
+                            </div>
+                        </div>
+                        <code class="d-block bg-light p-2 border rounded user-select-all fs-6 text-dark">admin_cyber' --</code>
+                        <div class="form-text small mt-1">מבצע עקיפת סיסמה ומתחבר מיד כמנהל המערכת.</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,6 +92,10 @@
 function fillAdmin() {
     document.getElementById('username').value = 'admin_cyber';
     document.getElementById('password').value = 'Cyber@2026Admin!';
+}
+function injectSqliLogin() {
+    document.getElementById('username').value = "admin_cyber' --";
+    document.getElementById('password').value = "";
 }
 </script>
 {% endblock %}
