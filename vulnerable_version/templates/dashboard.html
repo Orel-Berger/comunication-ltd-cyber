@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}מסך מערכת - Comunication_LTD (גרסה פגיעה){% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Header banner -->
+    <div class="col-12 mb-3">
+        <div class="p-3 bg-white rounded shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-1 text-primary">
+                    <i class="bi bi-hdd-network"></i> מערכת מידע - Comunication_LTD
+                </h3>
+                <p class="text-muted mb-0">ניהול לקוחות, חבילות גלישה באינטרנט ושיווק לפי סקטורים</p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-danger p-2 fs-6">
+                    <i class="bi bi-exclamation-triangle"></i> גרסה פגיעה (XSS + SQLi Enabled)
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert for newly added customer (Section 4 requirement) -->
+    {% if new_customer_name %}
+    <div class="col-12">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i class="bi bi-check-circle"></i> לקוח חדש נקלט בהצלחה במערכת!</h5>
+            <!-- VULNERABILITY: Rendered with | safe, triggering Stored XSS -->
+            <p class="mb-0">שם הלקוח שהוזן למסך: <strong>{{ new_customer_name | safe }}</strong></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Left column: Add New Customer Form -->
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-person-plus-fill"></i> הכנסת לקוח חדש למערכת
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_customer') }}">
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">שם מלא של הלקוח:</label>
+                        <!-- VULNERABLE TO STORED XSS -->
+                        <input type="text" class="form-control" id="full_name" name="full_name" placeholder="לדוגמה: רון כהן" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="identity_number" class="form-label">ת.ז / ח.פ:</label>
+                            <input type="text" class="form-control" id="identity_number" name="identity_number" placeholder="9 ספרות" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">מספר טלפון:</label>
+                            <input type="text" class="form-control" id="phone" name="phone" placeholder="050-0000000" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">כתובת דוא״ל:</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="client@example.com" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="sector_id" class="form-label">סקטור שיווקי:</label>
+                            <select class="form-select" id="sector_id" name="sector_id" required>
+                                {% for sector in sectors %}
+                                    <option value="{{ sector[0] }}">{{ sector[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="package_id" class="form-label">חבילת גלישה:</label>
+                            <select class="form-select" id="package_id" name="package_id" required>
+                                {% for package in packages %}
+                                    <option value="{{ package[0] }}">{{ package[1] }} ({{ package[2] }}Mb - {{ package[3] }} ₪)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">הערות / פרטים נוספים:</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="פרטי התקנה או דרישות מיוחדות"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-2">
+                        <i class="bi bi-save"></i> שמור לקוח חדש והצג למסך
+                    </button>
+                </form>
+
+                <!-- Stored XSS Exploit Box -->
+                <div class="exploit-card mt-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-bug-fill text-danger fs-5 me-2"></i>
+                        <strong class="text-danger">הדגמת Stored XSS (סעיף 4 בחלק ב'):</strong>
+                    </div>
+                    <p class="small text-muted mt-1 mb-2">
+                        שם הלקוח מוצג ישירות ללא סינון (Escape). הכנס בשם הלקוח את הפיילוד הבא:
+                    </p>
+                    <code class="d-block p-1 bg-white border rounded text-break user-select-all small">&lt;script&gt;alert('Stored XSS - Comunication_LTD!');&lt;/script&gt;</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column: Customer Directory & Search (SQLi) -->
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-people-fill"></i> מאגר לקוחות החברה וחבילות גלישה</span>
+                <span class="badge bg-primary">{{ customers | length }} לקוחות רשומים</span>
+            </div>
+            <div class="card-body">
+                <!-- Search bar vulnerable to SQLi -->
+                <form method="GET" action="{{ url_for('dashboard') }}" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="q" value="{{ search_query }}" placeholder="חיפוש לקוח לפי שם או ת.ז (פגיע ל-SQLi)...">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i> חפש
+                        </button>
+                        {% if search_query %}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">נקה</a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <!-- SQLi Exploit Box for Section 4 -->
+                <div class="exploit-card mb-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-terminal-fill text-danger fs-5 me-2"></i>
+                        <strong class="text-danger">הדגמת SQLi בסעיף 4 (חיפוש לקוחות):</strong>
+                    </div>
+                    <p class="small text-muted mt-1 mb-1">
+                        השאילתה משרשרת את החיפוש: <code>WHERE c.full_name LIKE '%{q}%'</code>. נסה UNION Injection להדלפת המשתמשים:
+                    </p>
+                    <code class="d-block p-1 bg-white border rounded text-break user-select-all small">' UNION SELECT u.id, u.username, u.email, u.salt, u.password_hash, 'סקטור', 'חבילה', 'סיסמה מוצפנת ב-HMAC' FROM users u --</code>
+                </div>
+
+                <!-- Table of Customers -->
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle small">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>שם לקוח</th>
+                                <th>ת.ז / מזהה</th>
+                                <th>דוא״ל</th>
+                                <th>טלפון</th>
+                                <th>סקטור</th>
+                                <th>חבילת גלישה</th>
+                                <th>הערות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in customers %}
+                            <tr>
+                                <td>{{ c[0] }}</td>
+                                <!-- VULNERABLE: Rendered with | safe, triggering Stored XSS -->
+                                <td class="fw-bold">{{ c[1] | safe }}</td>
+                                <td>{{ c[2] }}</td>
+                                <td>{{ c[3] }}</td>
+                                <td>{{ c[4] }}</td>
+                                <td><span class="badge badge-sector">{{ c[5] }}</span></td>
+                                <td><span class="badge badge-package">{{ c[6] }}</span></td>
+                                <td>{{ c[7] | safe if c[7] else '' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-3">לא נמצאו לקוחות במאגר</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

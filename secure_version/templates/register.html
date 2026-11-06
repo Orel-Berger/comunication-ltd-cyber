@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}הרשמת משתמש חדש - Comunication_LTD (מאובטח){% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h4 class="mb-0 text-success">
+                    <i class="bi bi-shield-check"></i> הרשמת משתמש חדש במערכת
+                </h4>
+                <div class="text-muted small">Comunication_LTD - גרסה מאובטחת</div>
+            </div>
+            <div class="card-body p-4">
+                <!-- Policy info box -->
+                <div class="policy-box">
+                    <div class="fw-bold mb-1"><i class="bi bi-info-circle"></i> דרישות מדיניות הסיסמאות (מנוהל בקונפיגורציה):</div>
+                    <ul class="mb-0">
+                        <li>אורך מינימלי: <strong>10 תווים</strong></li>
+                        <li>מורכבות: אותיות גדולות (A-Z), אותיות קטנות (a-z), ספרות (0-9), ותווים מיוחדים (!@#$%^&*)</li>
+                        <li>מניעת שימוש במילים נפוצות מתוך מילון המערכת</li>
+                        <li>הצפנת הסיסמה ב-DB באמצעות פונקציית <strong>HMAC + Salt</strong> ייעודית</li>
+                    </ul>
+                </div>
+
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">שם משתמש:</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="הזן שם משתמש (תווים אלפאנומריים בלבד)" required>
+                        <div class="form-text small">מנוטרל מתווים מיוחדים ומאומת ברמת הקוד.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">כתובת דוא״ל:</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="user@comunication-ltd.co.il" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">סיסמה מורכבת:</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="לפחות 10 תווים עם אותיות, ספרות ותווים מיוחדים" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">אימות סיסמה:</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="הזן שוב את הסיסמה" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="bi bi-shield-lock"></i> בצע הרשמה מאובטחת
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="text-decoration-none">
+                        <i class="bi bi-arrow-right"></i> כבר רשום? עבור למסך ההתחברות
+                    </a>
+                </div>
+
+                <div class="security-card mt-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shield-fill-check text-success fs-4 me-2"></i>
+                        <strong>הגנות אבטחה פעילות במסך הרישום:</strong>
+                    </div>
+                    <ul class="small text-muted mt-2 mb-0 ps-3">
+                        <li><strong>קידוד תווים מיוחדים (Input Encoding & Sanitization):</strong> סינון וקידוד תווים מיוחדים בשם המשתמש ובמייל.</li>
+                        <li><strong>שאילתות מפורמטות (Parameters):</strong> שימוש ב-Prepared Statements בבדיקת קיום המשתמש ובהכנסה ל-DB.</li>
+                        <li><strong>אחסון קריפטוגרפי:</strong> יצירת Salt אקראי חדש וחישוב HMAC-SHA256 סודי.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}הרשמת משתמש חדש - Comunication_LTD{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h4 class="mb-0 text-primary">
+                    <i class="bi bi-person-plus"></i> הרשמת משתמש חדש במערכת
+                </h4>
+                <div class="text-muted small">Comunication_LTD - שיווק חבילות גלישה</div>
+            </div>
+            <div class="card-body p-4">
+                <!-- Policy info box -->
+                <div class="policy-box">
+                    <div class="fw-bold mb-1"><i class="bi bi-info-circle"></i> דרישות מדיניות הסיסמאות (מנוהל בקונפיגורציה):</div>
+                    <ul class="mb-0">
+                        <li>אורך מינימלי: <strong>10 תווים</strong></li>
+                        <li>מורכבות: אותיות גדולות (A-Z), אותיות קטנות (a-z), ספרות (0-9), ותווים מיוחדים (!@#$%^&*)</li>
+                        <li>מניעת שימוש במילים נפוצות מתוך מילון המערכת</li>
+                        <li>הצפנת הסיסמה ב-DB באמצעות פונקציית <strong>HMAC + Salt</strong> ייעודית</li>
+                    </ul>
+                </div>
+
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">שם משתמש:</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="הזן שם משתמש (לדוגמה: user_dan)" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">כתובת דוא״ל:</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="user@comunication-ltd.co.il" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">סיסמה מורכבת:</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="לפחות 10 תווים עם אותיות, ספרות ותווים מיוחדים" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">אימות סיסמה:</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="הזן שוב את הסיסמה" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="bi bi-check-circle"></i> בצע הרשמה מאובטחת (HMAC + Salt)
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="text-decoration-none">
+                        <i class="bi bi-arrow-right"></i> כבר רשום? עבור למסך ההתחברות
+                    </a>
+                </div>
+
+                <div class="exploit-card mt-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-bug-fill text-danger fs-4 me-2"></i>
+                        <strong>מעבדת תקיפה - הדגמת SQL Injection בהרשמה:</strong>
+                    </div>
+                    <p class="small text-muted mt-2 mb-0">
+                        בדיקת קיום המשתמש בשלב הרישום מתבצעת ללא פרמטרים מוגנים:
+                        <code>SELECT * FROM users WHERE username = '{username}' OR email = '{email}'</code><br>
+                        הזרקת תווים מיוחדים כגון <code>test' OR '1'='1</code> משבשת את השאילתה.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

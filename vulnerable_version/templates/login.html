@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}התחברות - למערכת מידע Comunication_LTD{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header text-center py-3">
+                <h4 class="mb-0 text-primary">
+                    <i class="bi bi-shield-lock"></i> התחברות למערכת מידע
+                </h4>
+                <div class="text-muted small">Comunication_LTD - שיווק חבילות גלישה</div>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">שם משתמש:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="הזן שם משתמש" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">סיסמה:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="הזן סיסמה">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{{ url_for('forgot_password') }}" class="text-decoration-none small">
+                            <i class="bi bi-question-circle"></i> שכחתי סיסמה?
+                        </a>
+                        <a href="{{ url_for('register') }}" class="text-decoration-none small">
+                            <i class="bi bi-person-plus"></i> משתמש חדש? הירשם כאן
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="bi bi-box-arrow-in-left"></i> כניסה למערכת
+                    </button>
+                </form>
+
+                <div class="exploit-card mt-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-bug-fill text-danger fs-4 me-2"></i>
+                        <strong>מעבדת תקיפה - הדגמת SQL Injection ב-Login:</strong>
+                    </div>
+                    <p class="small text-muted mt-2 mb-1">
+                        בגרסה פגיעה זו, שאילתת ה-SQL משרשרת את הקלט ישירות:
+                        <code>SELECT * FROM users WHERE username = '{username}'</code>
+                    </p>
+                    <p class="small mb-0">
+                        <strong>פיילוד עקיפת התחברות (Bypass):</strong><br>
+                        הזן בשם המשתמש: <code class="bg-light p-1 border rounded">admin_cyber' --</code><br>
+                        והשאר את הסיסמה ריקה או הקש תו כלשהו כדי להתחבר ישירות כמנהל!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

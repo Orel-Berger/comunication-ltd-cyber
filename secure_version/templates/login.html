@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}התחברות - מערכת מידע Comunication_LTD (מאובטח){% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header text-center py-3">
+                <h4 class="mb-0 text-success">
+                    <i class="bi bi-shield-check"></i> התחברות למערכת מידע
+                </h4>
+                <div class="text-muted small">Comunication_LTD - גרסה מאובטחת</div>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">שם משתמש:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="הזן שם משתמש" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">סיסמה:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="הזן סיסמה" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{{ url_for('forgot_password') }}" class="text-decoration-none small">
+                            <i class="bi bi-question-circle"></i> שכחתי סיסמה?
+                        </a>
+                        <a href="{{ url_for('register') }}" class="text-decoration-none small">
+                            <i class="bi bi-person-plus"></i> משתמש חדש? הירשם כאן
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="bi bi-box-arrow-in-left"></i> כניסה מאובטחת
+                    </button>
+                </form>
+
+                <div class="security-card mt-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shield-lock-fill text-success fs-4 me-2"></i>
+                        <strong>הגנות אבטחה פעילות במסך זה:</strong>
+                    </div>
+                    <ul class="small text-muted mt-2 mb-0 ps-3">
+                        <li><strong>שאילתות מפורמטות (Parameterized Queries):</strong> כל קלט משתמש נשלח כפרמטר בלבד <code>WHERE username = ?</code> – חסימה הרמטית של SQLi!</li>
+                        <li><strong>אימות HMAC + Salt:</strong> אימות הסיסמה נעשה תמיד בפונקציה קריפטוגרפית עצמאית.</li>
+                        <li><strong>נעילת חשבון (Brute-Force Protection):</strong> נעילת חשבון אוטומטית לאחר 3 ניסיונות כושלים (נשלט מקובץ הקונפיגורציה).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
