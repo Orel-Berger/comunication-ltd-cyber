@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}תיבת דואר נכנסת - Comunication_LTD (מערכת שליחת מיילים){% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="p-3 bg-white rounded shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-1 text-primary">
+                    <i class="bi bi-mailbox2"></i> מרכז דואר יוצא / תיבת דואר (Email Dispatch Center)
+                </h3>
+                <p class="text-muted mb-0">תיעוד והצגת כל הודעות הדוא״ל וטוקני ה-SHA-1 שנשלחו למשתמשי Comunication_LTD</p>
+            </div>
+            <div>
+                <a href="{{ url_for('clear_emails') }}" class="btn btn-outline-danger btn-sm me-2" onclick="return confirm('האם לרוקן את תיבת הדואר?')">
+                    <i class="bi bi-trash"></i> רוקן תיבה
+                </a>
+                <a href="{{ url_for('forgot_password') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-send"></i> שחזור סיסמה
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        {% if emails %}
+            {% for em in emails | reverse %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <span class="badge bg-primary me-2">נשלח בדוא״ל</span>
+                            <strong>אל:</strong> <code class="user-select-all fs-6">{{ em.to }}</code>
+                            <span class="text-muted ms-2">(משתמש: {{ em.username }})</span>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="bi bi-clock"></i> {{ em.timestamp }}
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-lg-6 mb-3">
+                                <h5 class="card-title text-dark">{{ em.subject }}</h5>
+                                <div class="p-3 bg-white border rounded shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-success fs-6"><i class="bi bi-shield-lock"></i> קוד אימות SHA-1 שנוצר:</span>
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="copyToClipboard('{{ em.reset_token }}', this)">
+                                            <i class="bi bi-clipboard"></i> העתק קוד SHA-1
+                                        </button>
+                                    </div>
+                                    <code class="d-block p-2 bg-light border rounded user-select-all text-break fw-bold text-dark fs-6">{{ em.reset_token }}</code>
+                                    
+                                    <div class="mt-3">
+                                        <a href="{{ em.reset_link }}" class="btn btn-primary w-100">
+                                            <i class="bi bi-box-arrow-up-right"></i> היכנס ישירות מקישור המייל לאיפוס סיסמה
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <h6 class="text-muted mb-2"><i class="bi bi-eye"></i> תצוגה מקדימה של גוף המייל (HTML):</h6>
+                                <div class="border rounded p-3 bg-white" style="max-height: 250px; overflow-y: auto;">
+                                    {{ em.html | safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card text-center p-5 shadow-sm">
+                <i class="bi bi-envelope-x text-muted" style="font-size: 3rem;"></i>
+                <h4 class="mt-3 text-muted">תיבת הדואר ריקה</h4>
+                <p class="text-muted">טרם נשלחו מיילים לשחזור סיסמה במערכת.</p>
+                <div>
+                    <a href="{{ url_for('forgot_password') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> גש למסך "שכחתי סיסמה" והפק טוקן SHA-1 חדש
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

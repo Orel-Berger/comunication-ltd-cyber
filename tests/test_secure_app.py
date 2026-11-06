@@ -184,5 +184,11 @@ class TestSecureApp(unittest.TestCase):
         self.assertEqual(resp.headers.get("X-Content-Type-Options"), "nosniff")
         self.assertEqual(resp.headers.get("X-Frame-Options"), "DENY")
 
+    def test_09_mailbox_integration(self):
+        """Test Part A Section 5: Mailbox records SHA-1 token email and renders."""
+        resp = self.client.get("/mailbox")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("מרכז דואר יוצא".encode("utf-8"), resp.data)
+
 if __name__ == "__main__":
     unittest.main()

@@ -188,5 +188,11 @@ class TestVulnerableApp(unittest.TestCase):
         self.assertIn("admin_cyber".encode("utf-8"), resp.data)
         self.assertIn("LEAK_SEC".encode("utf-8"), resp.data)
 
+    def test_08_mailbox_integration(self):
+        """Test Part A Section 5: Mailbox renders sent SHA-1 emails."""
+        resp = self.client.get("/mailbox")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("מרכז דואר יוצא".encode("utf-8"), resp.data)
+
 if __name__ == "__main__":
     unittest.main()

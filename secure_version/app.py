@@ -18,7 +18,7 @@ from utils.auth_helpers import (
     validate_password_complexity,
     load_password_policy
 )
-from utils.mailer import send_password_reset_email
+from utils.mailer import send_password_reset_email, get_all_emails, clear_mailbox
 
 app = Flask(__name__)
 app.secret_key = "secure_production_secret_key_comunication_ltd_2026"
@@ -533,6 +533,17 @@ def add_customer():
     # Safely saved - template will render with auto-escaping, preventing XSS
     session["new_customer_name"] = clean_name
     return redirect(url_for("dashboard"))
+
+@app.route("/mailbox")
+def mailbox():
+    emails = get_all_emails()
+    return render_template("mailbox.html", emails=emails)
+
+@app.route("/clear-emails")
+def clear_emails():
+    clear_mailbox()
+    flash("תיבת הדואר רוקנה בהצלחה.", "info")
+    return redirect(url_for("mailbox"))
 
 @app.route("/logout")
 def logout():
