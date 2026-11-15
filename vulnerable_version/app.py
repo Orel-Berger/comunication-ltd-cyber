@@ -181,7 +181,6 @@ def login():
         else:
             # Increment failed attempts
             new_attempts = user["failed_attempts"] + 1
-            locked_until_val = "NULL"
             if new_attempts >= max_attempts:
                 lockout_duration = policy.get("lockout_duration_minutes", 15)
                 lock_time = (datetime.now(timezone.utc) + timedelta(minutes=lockout_duration)).isoformat()

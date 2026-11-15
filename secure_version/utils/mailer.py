@@ -252,17 +252,6 @@ def get_all_emails():
         return []
 
 
-def get_latest_email(to_email: str = None):
-    """Retrieve the latest sent email."""
-    emails = get_all_emails()
-    if not emails:
-        return None
-    if to_email:
-        filtered = [e for e in emails if e["to"].lower() == to_email.lower()]
-        return filtered[-1] if filtered else None
-    return emails[-1]
-
-
 def clear_mailbox():
     """Clear all stored simulated emails."""
     with open(SIMULATED_INBOX_FILE, "w", encoding="utf-8") as f:

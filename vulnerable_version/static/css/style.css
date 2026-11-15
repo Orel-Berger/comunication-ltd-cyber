@@ -35,11 +35,6 @@ body {
     color: white;
 }
 
-.brand-badge.secure {
-    background-color: #198754;
-    color: white;
-}
-
 .card {
     border-radius: 10px;
     box-shadow: var(--card-shadow);

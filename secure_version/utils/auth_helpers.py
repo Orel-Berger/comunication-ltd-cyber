@@ -2,7 +2,7 @@ import os
 import json
 import hmac
 import hashlib
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 HMAC_SECRET_KEY = b"Comunication_LTD_Secure_HMAC_Secret_Key_2026_Project"
 
