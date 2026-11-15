@@ -16,7 +16,13 @@ from utils.auth_helpers import (
     validate_password_complexity,
     load_password_policy
 )
-from utils.mailer import send_password_reset_email, get_all_emails, clear_mailbox
+from utils.mailer import (
+    send_password_reset_email,
+    get_all_emails,
+    clear_mailbox,
+    load_email_config,
+    save_email_config
+)
 
 app = Flask(__name__)
 app.secret_key = "vulnerable_secret_session_key_comunication_ltd"
@@ -287,8 +293,12 @@ def forgot_password():
         conn.commit()
         conn.close()
 
-        # Send simulated email
-        send_password_reset_email(user["email"], user["username"], token_sha1, request.host_url.rstrip("/"))
+        # Send email via Resend / Brevo / SMTP + save to Web Mailbox
+        email_result = send_password_reset_email(user["email"], user["username"], token_sha1, request.host_url.rstrip("/"))
+        if email_result.get("external_sent"):
+            flash(f"✅ {email_result.get('delivery_message')}", "success")
+        else:
+            flash(f"ℹ️ {email_result.get('delivery_message')}", "info")
 
         return render_template(
             "forgot_password.html",
@@ -475,7 +485,32 @@ def add_customer():
 @app.route("/mailbox")
 def mailbox():
     emails = get_all_emails()
-    return render_template("mailbox.html", emails=emails)
+    email_config = load_email_config()
+    return render_template("mailbox.html", emails=emails, email_config=email_config)
+
+@app.route("/save-email-config", methods=["POST"])
+def update_email_config():
+    cfg = load_email_config()
+    cfg["provider"] = request.form.get("provider", "resend").strip().lower()
+    cfg["override_recipient_email"] = request.form.get("override_recipient_email", "").strip()
+    cfg["resend"] = {
+        "api_key": request.form.get("resend_api_key", "").strip(),
+        "from_email": request.form.get("resend_from_email", "Comunication_LTD <onboarding@resend.dev>").strip() or "Comunication_LTD <onboarding@resend.dev>"
+    }
+    cfg["brevo"] = {
+        "api_key": request.form.get("brevo_api_key", "").strip(),
+        "sender_email": request.form.get("brevo_sender_email", "").strip(),
+        "sender_name": "Comunication_LTD Security"
+    }
+    cfg["smtp"] = {
+        "host": request.form.get("smtp_host", "smtp.gmail.com").strip() or "smtp.gmail.com",
+        "port": int(request.form.get("smtp_port", 587) or 587),
+        "user": request.form.get("smtp_user", "").strip(),
+        "password": request.form.get("smtp_password", "").strip()
+    }
+    save_email_config(cfg)
+    flash("הגדרות שליחת המייל (Resend / Brevo / SMTP) נשמרו בהצלחה ב-config/email_config.json!", "success")
+    return redirect(url_for("mailbox"))
 
 @app.route("/clear-emails")
 def clear_emails():

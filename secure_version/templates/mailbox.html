@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}תיבת דואר נכנסת - Comunication_LTD (מערכת שליחת מיילים){% endblock %}
+{% block title %}תיבת דואר נכנסת והגדרות Resend API - Comunication_LTD{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -8,11 +8,14 @@
         <div class="p-3 bg-white rounded shadow-sm d-flex justify-content-between align-items-center">
             <div>
                 <h3 class="mb-1 text-primary">
-                    <i class="bi bi-mailbox2"></i> מרכז דואר יוצא / תיבת דואר (Email Dispatch Center)
+                    <i class="bi bi-mailbox2"></i> מרכז דואר יוצא והגדרות Resend API
                 </h3>
-                <p class="text-muted mb-0">תיעוד והצגת כל הודעות הדוא״ל וטוקני ה-SHA-1 שנשלחו למשתמשי Comunication_LTD</p>
+                <p class="text-muted mb-0">שליחת מיילים אמיתיים עם טוקן SHA-1 באמצעות Resend API / Brevo / SMTP + תיבת דואר מובנית</p>
             </div>
             <div>
+                <button class="btn btn-outline-primary btn-sm me-2" type="button" data-bs-toggle="collapse" data-bs-target="#emailConfigCollapse">
+                    <i class="bi bi-gear-fill"></i> הגדרות Resend / מייל אמיתי
+                </button>
                 <a href="{{ url_for('clear_emails') }}" class="btn btn-outline-danger btn-sm me-2" onclick="return confirm('האם לרוקן את תיבת הדואר?')">
                     <i class="bi bi-trash"></i> רוקן תיבה
                 </a>
@@ -23,21 +26,94 @@
         </div>
     </div>
 
+    <!-- Collapsible Email API Configuration Panel -->
+    <div class="col-12 mb-4 collapse {% if not email_config.resend.api_key and not email_config.brevo.api_key and not email_config.smtp.user %}show{% endif %}" id="emailConfigCollapse">
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cloud-arrow-up-fill me-1"></i> הגדרת חיבור API לשליחת מייל אמיתי (נשמר ב-<code>config/email_config.json</code>)</span>
+                {% if email_config.resend.api_key or email_config.brevo.api_key or email_config.smtp.user %}
+                    <span class="badge bg-success">מוגדר ומוכן לשליחה</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">ממתין למפתח API (פועל במצב Web Mailbox מקומי)</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('update_email_config') }}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">ספק שליחת מיילים פעיל:</label>
+                            <select name="provider" class="form-select">
+                                <option value="resend" {% if email_config.provider == 'resend' %}selected{% endif %}>Resend API (מומלץ ומהיר - בחינם)</option>
+                                <option value="brevo" {% if email_config.provider == 'brevo' %}selected{% endif %}>Brevo API (שליחה לכל כתובת ללא דומיין)</option>
+                                <option value="smtp" {% if email_config.provider == 'smtp' %}selected{% endif %}>Gmail SMTP (App Password)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">כתובת מייל אישית לקבלת הטוקנים (Override Recipient Email):</label>
+                            <input type="email" name="override_recipient_email" class="form-control" value="{{ email_config.override_recipient_email }}" placeholder="לדוגמה: your_email@gmail.com (מנתב אליך גם מיילים של משתמשי הדמה כמו admin_cyber)">
+                            <div class="form-text">בחשבון חינמי של Resend ללא דומיין, הזן כאן את המייל שאיתו נרשמת ל-Resend כדי שכל טוקן יגיע ישירות לתיבת הדואר שלך.</div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <!-- Resend Settings -->
+                        <div class="col-md-6">
+                            <label class="form-label text-primary fw-bold"><i class="bi bi-lightning-charge"></i> Resend API Key:</label>
+                            <input type="text" name="resend_api_key" class="form-control font-monospace" value="{{ email_config.resend.api_key }}" placeholder="re_123456789...">
+                            <div class="form-text">השג מפתח בחינם תוך 30 שניות באתר <a href="https://resend.com/api-keys" target="_blank">resend.com/api-keys</a></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-primary fw-bold">כתובת שולח ב-Resend (From):</label>
+                            <input type="text" name="resend_from_email" class="form-control font-monospace" value="{{ email_config.resend.from_email }}">
+                        </div>
+
+                        <!-- Brevo Settings (Optional) -->
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-bold">Brevo API Key (אופציונלי):</label>
+                            <input type="text" name="brevo_api_key" class="form-control font-monospace" value="{{ email_config.brevo.api_key }}" placeholder="xkeysib-...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary fw-bold">Brevo Verified Sender Email (אופציונלי):</label>
+                            <input type="email" name="brevo_sender_email" class="form-control" value="{{ email_config.brevo.sender_email }}" placeholder="your_verified@gmail.com">
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> שמור הגדרות מייל
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="col-12">
         {% if emails %}
             {% for em in emails | reverse %}
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
                         <div>
-                            <span class="badge bg-primary me-2">נשלח בדוא״ל</span>
-                            <strong>אל:</strong> <code class="user-select-all fs-6">{{ em.to }}</code>
-                            <span class="text-muted ms-2">(משתמש: {{ em.username }})</span>
+                            {% if em.external_sent %}
+                                <span class="badge bg-success me-2"><i class="bi bi-check-circle"></i> נשלח לענן ({{ em.provider }})</span>
+                            {% else %}
+                                <span class="badge bg-primary me-2"><i class="bi bi-inbox"></i> תיבה מקומית</span>
+                            {% endif %}
+                            <strong>משתמש:</strong> <code>{{ em.username }}</code> ({{ em.to }})
+                            {% if em.actual_recipient and em.actual_recipient != em.to %}
+                                <span class="badge bg-info text-dark ms-2">נותב אל: {{ em.actual_recipient }}</span>
+                            {% endif %}
                         </div>
                         <div class="text-muted small">
                             <i class="bi bi-clock"></i> {{ em.timestamp }}
                         </div>
                     </div>
                     <div class="card-body p-4">
+                        {% if em.delivery_message %}
+                            <div class="alert {% if em.external_sent %}alert-success{% else %}alert-secondary{% endif %} py-2 small mb-3">
+                                <strong>סטטוס משלוח:</strong> {{ em.delivery_message }}
+                            </div>
+                        {% endif %}
                         <div class="row">
                             <div class="col-lg-6 mb-3">
                                 <h5 class="card-title text-dark">{{ em.subject }}</h5>
@@ -59,7 +135,7 @@
                             </div>
 
                             <div class="col-lg-6 mb-3">
-                                <h6 class="text-muted mb-2"><i class="bi bi-eye"></i> תצוגה מקדימה של גוף המייל (HTML):</h6>
+                                <h6 class="text-muted mb-2"><i class="bi bi-eye"></i> תצוגה מקדימה של גוף המייל שנשלח (HTML):</h6>
                                 <div class="border rounded p-3 bg-white" style="max-height: 250px; overflow-y: auto;">
                                     {{ em.html | safe }}
                                 </div>

@@ -1,0 +1,21 @@
+{
+  "email_settings": {
+    "provider": "resend",
+    "override_recipient_email": "",
+    "resend": {
+      "api_key": "",
+      "from_email": "Comunication_LTD <onboarding@resend.dev>"
+    },
+    "brevo": {
+      "api_key": "",
+      "sender_email": "",
+      "sender_name": "Comunication_LTD Security"
+    },
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": 587,
+      "user": "",
+      "password": ""
+    }
+  }
+}
